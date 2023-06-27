@@ -53,6 +53,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                     Intent(this@AddTaskActivity, TaskActivity::class.java).also {
                         startActivity(it)
                     }
+                    finish()
                 }
                 true
             }
