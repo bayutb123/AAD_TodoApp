@@ -38,7 +38,7 @@ class TaskActivity : AppCompatActivity() {
             startActivity(addIntent)
         }
 
-        //TODO 6 : Initiate RecyclerView with LayoutManager
+        //TODO 6 : Initiate RecyclerView with LayoutManager OK
         recycler = findViewById(R.id.rv_task)
         recycler.layoutManager = LinearLayoutManager(this)
 
@@ -53,7 +53,7 @@ class TaskActivity : AppCompatActivity() {
     }
 
     private fun showRecyclerView(task: PagedList<Task>) {
-        //TODO 7 : Submit pagedList to adapter and update database when onCheckChange
+        //TODO 7 : Submit pagedList to adapter and update database when onCheckChange OK
         val adapter = TaskAdapter(onCheckedChange = { taskId, b ->
             taskViewModel.completeTask(taskId, b)
         })
