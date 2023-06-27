@@ -1,7 +1,6 @@
 package com.dicoding.todoapp.data
 
 import android.content.Context
-import android.util.Log
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
@@ -16,23 +15,19 @@ import org.json.JSONObject
 import java.io.BufferedReader
 import java.io.IOException
 import java.io.InputStreamReader
+import java.util.concurrent.Executors
 
-//TODO 3 : Define room database class and prepopulate database using JSON
+//TODO 3 : Define room database class and prepopulate database using JSON OK
 @Database(version = 1, entities = [Task::class])
 abstract class TaskDatabase : RoomDatabase() {
 
     abstract fun taskDao(): TaskDao
 
-    class DatabaseCallback(private val context: Context) : Callback() {
-        override fun onCreate(db: SupportSQLiteDatabase) {
-            super.onCreate(db)
-            fillWithStartingData(context, getInstance(context).taskDao())
-        }
-    }
     companion object {
 
         @Volatile
         private var INSTANCE: TaskDatabase? = null
+
 
         fun getInstance(context: Context): TaskDatabase {
             return INSTANCE ?: synchronized(this) {
@@ -40,7 +35,18 @@ abstract class TaskDatabase : RoomDatabase() {
                     context.applicationContext,
                     TaskDatabase::class.java,
                     "task.db"
-                ).addCallback(DatabaseCallback(context)).build()
+                ).fallbackToDestructiveMigration().addCallback(object : Callback() {
+                    override fun onCreate(db: SupportSQLiteDatabase) {
+                        super.onCreate(db)
+                        Executors.newSingleThreadExecutor().execute {
+                            INSTANCE?.let {
+                                CoroutineScope(Dispatchers.IO).launch {
+                                    fillWithStartingData(context, it.taskDao())
+                                }
+                            }
+                        }
+                    }
+                }).build()
                 INSTANCE = instance
                 instance
             }
@@ -48,7 +54,6 @@ abstract class TaskDatabase : RoomDatabase() {
 
         private fun fillWithStartingData(context: Context, dao: TaskDao) {
             val task = loadJsonArray(context)
-            Log.d("JSON", task.toString())
             try {
                 if (task != null) {
                     for (i in 0 until task.length()) {
@@ -62,8 +67,6 @@ abstract class TaskDatabase : RoomDatabase() {
                                 item.getBoolean("completed")
                             )
                         )
-
-                        Log.d("Test", dao.getNearestActiveTask().toString())
                     }
                 }
             } catch (exception: JSONException) {

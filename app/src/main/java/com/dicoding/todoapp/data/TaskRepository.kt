@@ -6,7 +6,6 @@ import androidx.paging.LivePagedListBuilder
 import androidx.paging.PagedList
 import com.dicoding.todoapp.utils.FilterUtils
 import com.dicoding.todoapp.utils.TasksFilterType
-import kotlin.coroutines.coroutineContext
 
 class TaskRepository(private val tasksDao: TaskDao) {
 
@@ -20,7 +19,7 @@ class TaskRepository(private val tasksDao: TaskDao) {
         fun getInstance(context: Context): TaskRepository {
             return instance ?: synchronized(this) {
                 if (instance == null) {
-                    val database = TaskDatabase.getInstance(context)
+                    val database = TaskDatabase.getInstance(context.applicationContext)
                     instance = TaskRepository(database.taskDao())
                 }
                 return instance as TaskRepository

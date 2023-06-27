@@ -1,6 +1,5 @@
 package com.dicoding.todoapp.data
 
-import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.paging.DataSource
 import androidx.room.Dao
@@ -11,7 +10,7 @@ import androidx.room.Query
 import androidx.room.RawQuery
 import androidx.sqlite.db.SupportSQLiteQuery
 
-//TODO 2 : Define data access object (DAO)
+//TODO 2 : Define data access object (DAO) OK
 @Dao
 interface TaskDao {
 
@@ -27,10 +26,8 @@ interface TaskDao {
     @Insert
     suspend fun insertTask(task: Task): Long
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
-    fun insertAll(vararg tasks: Task) {
-        Log.d("Insert Task", tasks.toString())
-    }
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertAll(vararg tasks: Task)
 
     @Delete
     suspend fun deleteTask(task: Task)
