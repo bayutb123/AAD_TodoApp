@@ -1,22 +1,31 @@
 package com.dicoding.todoapp.ui.add
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import com.dicoding.todoapp.R
+import com.dicoding.todoapp.data.Task
+import com.dicoding.todoapp.ui.ViewModelFactory
+import com.dicoding.todoapp.ui.list.TaskActivity
 import com.dicoding.todoapp.utils.DatePickerFragment
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Calendar
+import java.util.Locale
 
 class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListener {
     private var dueDateMillis: Long = System.currentTimeMillis()
+    private lateinit var viewModel: AddTaskViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add_task)
+        val factory = ViewModelFactory.getInstance(this)
+        viewModel = ViewModelProvider(this, factory)[AddTaskViewModel::class.java]
 
         supportActionBar?.title = getString(R.string.add_task)
 
@@ -30,9 +39,24 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save -> {
-                //TODO 12 : Create AddTaskViewModel and insert new task to database
+                val title = findViewById<TextView>(R.id.add_ed_title).text.toString()
+                val description = findViewById<TextView>(R.id.add_ed_description).text.toString()
+                val task = Task(
+                    title = title,
+                    description = description,
+                    dueDateMillis = dueDateMillis,
+                    isCompleted = false
+                )
+
+                if (task.title != "" || task.description != "") {
+                    viewModel.addTask(task)
+                    Intent(this@AddTaskActivity, TaskActivity::class.java).also {
+                        startActivity(it)
+                    }
+                }
                 true
             }
+
             else -> super.onOptionsItemSelected(item)
         }
     }
