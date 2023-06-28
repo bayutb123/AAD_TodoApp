@@ -46,7 +46,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
                     title = title,
                     description = description,
                     dueDateMillis = dueDateMillis,
-                    isCompleted = false
+                    completed = false
                 )
 
                 if (task.title != "" || task.description != "") {

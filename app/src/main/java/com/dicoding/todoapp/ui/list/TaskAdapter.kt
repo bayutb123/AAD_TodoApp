@@ -31,7 +31,7 @@ class TaskAdapter(
         holder.bind(task)
         when {
             //TODO 10 : Display title based on status using TitleTextView OK
-            task.isCompleted -> {
+            task.completed -> {
                 //DONE
                 holder.tvTitle.text = task.title
                 holder.tvTitle.state = 1
@@ -71,7 +71,7 @@ class TaskAdapter(
                 itemView.context.startActivity(detailIntent)
             }
             cbComplete.setOnClickListener {
-                onCheckedChange(task, !task.isCompleted)
+                onCheckedChange(task, !task.completed)
             }
         }
 

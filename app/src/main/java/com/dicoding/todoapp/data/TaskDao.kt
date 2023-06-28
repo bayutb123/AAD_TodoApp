@@ -20,7 +20,7 @@ interface TaskDao {
     @Query("SELECT * FROM tasks WHERE id=:taskId")
     fun getTaskById(taskId: Int): LiveData<Task>
 
-    @Query("SELECT * FROM tasks ORDER BY dueDateMillis ASC")
+    @Query("SELECT * FROM tasks WHERE completed = 0 ORDER BY dueDateMillis ASC")
     fun getNearestActiveTask(): Task
 
     @Insert
@@ -32,7 +32,7 @@ interface TaskDao {
     @Delete
     suspend fun deleteTask(task: Task)
 
-    @Query("UPDATE tasks SET isCompleted=:completed WHERE id=:taskId")
+    @Query("UPDATE tasks SET completed=:completed WHERE id=:taskId")
     suspend fun updateCompleted(taskId: Int, completed: Boolean)
     
 }
