@@ -39,6 +39,7 @@ class AddTaskActivity : AppCompatActivity(), DatePickerFragment.DialogDateListen
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             R.id.action_save -> {
+                //TODO 12 : Create AddTaskViewModel and insert new task to database
                 val title = findViewById<TextView>(R.id.add_ed_title).text.toString()
                 val description = findViewById<TextView>(R.id.add_ed_description).text.toString()
                 val task = Task(

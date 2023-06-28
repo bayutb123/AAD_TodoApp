@@ -2,6 +2,7 @@ package com.dicoding.todoapp.ui.list
 
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
@@ -54,8 +55,9 @@ class TaskActivity : AppCompatActivity() {
 
     private fun showRecyclerView(task: PagedList<Task>) {
         //TODO 7 : Submit pagedList to adapter and update database when onCheckChange OK
-        val adapter = TaskAdapter(onCheckedChange = { taskId, b ->
-            taskViewModel.completeTask(taskId, b)
+        val adapter = TaskAdapter(onCheckedChange = { task, b ->
+            taskViewModel.completeTask(task, b)
+            showSnackBar(Event(R.string.empty_task_message))
         })
         recycler.adapter = adapter
         adapter.submitList(task)
