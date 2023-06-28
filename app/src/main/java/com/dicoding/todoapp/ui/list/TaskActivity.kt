@@ -56,7 +56,7 @@ class TaskActivity : AppCompatActivity() {
         //TODO 7 : Submit pagedList to adapter and update database when onCheckChange OK
         val adapter = TaskAdapter(onCheckedChange = { task, b ->
             taskViewModel.completeTask(task, b)
-            val msg = if (task.completed) {
+            val msg = if (task.isCompleted) {
                 R.string.task_marked_active
             } else {
                 R.string.task_marked_complete

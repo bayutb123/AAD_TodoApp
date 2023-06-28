@@ -9,9 +9,7 @@ import android.os.Build
 import android.util.Log
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.preference.PreferenceFragmentCompat
 import androidx.preference.PreferenceManager
-import androidx.preference.SwitchPreference
 import androidx.work.Worker
 import androidx.work.WorkerParameters
 import com.dicoding.todoapp.R
@@ -21,6 +19,7 @@ import com.dicoding.todoapp.ui.detail.DetailTaskActivity
 import com.dicoding.todoapp.utils.NOTIFICATION_CHANNEL_ID
 import com.dicoding.todoapp.utils.TASK_ID
 
+@Suppress("DEPRECATION")
 class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
     private val channelName = inputData.getString(NOTIFICATION_CHANNEL_ID)
@@ -32,7 +31,10 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
         return TaskStackBuilder.create(applicationContext).run {
             addNextIntentWithParentStack(intent)
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE)
+                getPendingIntent(
+                    0,
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                )
             } else {
                 getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT)
             }
@@ -42,34 +44,47 @@ class NotificationWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, p
     override fun doWork(): Result {
         //TODO 14 : If notification preference on, get nearest active task from repository and show notification with pending intent OK
         val pref = PreferenceManager.getDefaultSharedPreferences(applicationContext)
-        val notificationPref = pref.getBoolean(applicationContext.getString(R.string.pref_key_notify), false)
+        val notificationPref =
+            pref.getBoolean(applicationContext.getString(R.string.pref_key_notify), false)
         if (notificationPref) {
-            val nearestTask = TaskRepository.getInstance(context = applicationContext).getNearestActiveTask()
-            getPendingIntent(nearestTask)?.let { showNotification(task = nearestTask, pendingIntent = it) }
+            val nearestTask =
+                TaskRepository.getInstance(context = applicationContext).getNearestActiveTask()
+            getPendingIntent(nearestTask)?.let {
+                showNotification(
+                    task = nearestTask,
+                    pendingIntent = it
+                )
+            }
             Log.d("Near Task", nearestTask.title)
         }
         return Result.success()
     }
 
     private fun showNotification(task: Task, pendingIntent: PendingIntent) {
-        val notificationManager = applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val notificationManager =
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            val channel = NotificationChannel(
+            val mChannel = NotificationChannel(
                 NOTIFICATION_CHANNEL_ID,
-                applicationContext.getString(R.string.notify_channel_name),
-                NotificationManager.IMPORTANCE_DEFAULT
+                channelName,
+                NotificationManager.IMPORTANCE_HIGH
             )
+            notificationManager.createNotificationChannel(mChannel)
 
-            notificationManager.createNotificationChannel(channel)
         }
 
         val nBuilder = NotificationCompat.Builder(
             applicationContext
         ).apply {
-            setContentTitle(applicationContext.getString(R.string.app_name))
+            setContentTitle(task.title)
             setSmallIcon(R.drawable.ic_notifications)
-            setContentText(task.title)
+            setContentText(
+                applicationContext.getString(
+                    R.string.notify_content,
+                    task.dueDateMillis.toString()
+                )
+            )
             setContentIntent(pendingIntent)
             setAutoCancel(true)
         }

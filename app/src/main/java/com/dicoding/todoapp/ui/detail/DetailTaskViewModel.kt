@@ -21,9 +21,9 @@ class DetailTaskViewModel(private val taskRepository: TaskRepository): ViewModel
         _taskId.value = taskId
     }
 
-    fun deleteTask() {
+    fun deleteTask(task: Task) {
         viewModelScope.launch {
-            _task.value?.let { taskRepository.deleteTask(it) }
+            taskRepository.deleteTask(task)
         }
     }
 }
