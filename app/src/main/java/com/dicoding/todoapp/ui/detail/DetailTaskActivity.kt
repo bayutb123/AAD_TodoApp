@@ -22,6 +22,11 @@ class DetailTaskActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_task_detail)
 
+        val title = findViewById<TextView>(R.id.detail_ed_title)
+        val description = findViewById<TextView>(R.id.detail_ed_description)
+        val dueDate = findViewById<TextView>(R.id.detail_ed_due_date)
+        val deleteButton = findViewById<Button>(R.id.btn_delete_task)
+
         //TODO 11 : Show detail task and implement delete action OK
 
 
@@ -30,19 +35,12 @@ class DetailTaskActivity : AppCompatActivity() {
 
         val taskId = intent.getIntExtra(TASK_ID, 0)
         val task = getTaskData(taskId)
-        task.observe(this, Observer(this::showTaskData))
-    }
-
-    private fun showTaskData(task: Task) {
-        val title = findViewById<TextView>(R.id.detail_ed_title)
-        val description = findViewById<TextView>(R.id.detail_ed_description)
-        val dueDate = findViewById<TextView>(R.id.detail_ed_due_date)
-        val deleteButton = findViewById<Button>(R.id.btn_delete_task)
-
-        deleteButton.setOnClickListener { viewModel.deleteTask(task) }
-        title.text = task.title
-        description.text = task.description
-        dueDate.text = DateConverter.convertMillisToString(task.dueDateMillis)
+        task.observe(this, Observer { task->
+            deleteButton.setOnClickListener { viewModel.deleteTask(task) }
+            title.text = task.title
+            description.text = task.description
+            dueDate.text = DateConverter.convertMillisToString(task.dueDateMillis)
+        })
     }
 
     private fun getTaskData(taskId: Int): LiveData<Task> {
